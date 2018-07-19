@@ -1,6 +1,8 @@
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
-using Arch.Data.Orm;
+using Newtonsoft.Json;
 
 namespace ${host.getNameSpace()}.Entity.DataModel
 {
@@ -8,7 +10,7 @@ namespace ${host.getNameSpace()}.Entity.DataModel
     /// ${host.getTableName()}
     /// </summary>
     [Serializable]
-    [Table(Name = "${host.getTableName()}")]
+    [Table("${host.getTableName()}")]
     public partial class ${host.getClassName()}
     {
 #foreach($column in $host.getColumns())
@@ -20,7 +22,11 @@ namespace ${host.getNameSpace()}.Entity.DataModel
 #if($column.isDataChangeLastTimeField())
         [Ignored]
 #end
-        [Column(Name = "${column.getName()}",ColumnType=DbType.${column.getDbType()}#if($column.getLength() > 0),Length=${column.getLength()}#end)#if($column.isIdentity()),ID#end#if($column.isPrimary()),PK#end]
+#if($column.isPrimary())
+        [Key]
+#end
+        [Column("${column.getName()}")]
+        [JsonProperty(PropertyName = "${column.getName()}")]
         public ${column.getType()}#if($column.isNullable() && $column.isValueType() && $column.getType() != "string")?#end #if($WordUtils.capitalize($column.getName()) == $host.getClassName())${host.getClassName()}_Gen#{else}${WordUtils.capitalize($column.getName())}#end { get; set; }
 #end
     }
